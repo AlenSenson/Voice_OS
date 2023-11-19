@@ -5,9 +5,8 @@ import numpy as np
 import threading
 import wavio as wv
 import subprocess 
-import back_end
+import api_s
 
-#main window
 class SimpleApp:
     def __init__(self, root):
         self.root = root
@@ -56,10 +55,12 @@ class SimpleApp:
         # Convert the NumPy array to audio file
         wv.write("recording1.wav", audio_data, 44100, sampwidth=2)
         
-        ques = back_end.transcrpt("recording1.wav")
-        command=back_end.chat(ques)
+        ques = api_s.transcrpt("recording1.wav")
+        command=api_s.chat(ques)
         print(command)
 
+ 
+        
         
         # Run the command using subprocess 
         try: 
@@ -71,8 +72,11 @@ class SimpleApp:
             # Handle any errors that occur during command execution 
             print(f"Command execution failed: {e}")
 
-     
-#main func
+
+        
+
+        
+
 def main():
     root = tk.Tk()
     app = SimpleApp(root)
