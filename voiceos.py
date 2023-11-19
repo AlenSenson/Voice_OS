@@ -13,7 +13,7 @@ class SimpleApp:
         self.root.title("Voice OS")
         self.root.minsize(300, 250)  # Set minimum window size
 
-        self.microphone_icon = tk.PhotoImage(file="C:\\Top100\\microphone-342.png")  # Replace with your microphone icon path
+        self.microphone_icon = tk.PhotoImage(file="microphone-342.png")  # Replace with your microphone icon path
 
         self.frame = tk.Frame(self.root)
         self.frame.pack(expand=True)
