@@ -25,7 +25,7 @@ cd Voice_OS
 To run use the following command
 
 ```sh
-python front_end.py
+python voiceos.py
 ```
 
 
