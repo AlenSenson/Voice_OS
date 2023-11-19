@@ -1,86 +1,45 @@
-import tkinter as tk
-import time
+from openai import OpenAI
+
+
+# import required libraries
 import sounddevice as sd
-import numpy as np
-import threading
+from scipy.io.wavfile import write
 import wavio as wv
-import subprocess 
-import api_s
+import os , keys
 
-class SimpleApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Voice OS")
-        self.root.minsize(300, 250)  # Set minimum window size
+from openai import OpenAI
 
-        self.microphone_icon = tk.PhotoImage(file="C:\\Top100\\microphone-342.png")  # Replace with your microphone icon path
-
-        self.frame = tk.Frame(self.root)
-        self.frame.pack(expand=True)
-
-        self.microphone_label = tk.Label(self.frame, image=self.microphone_icon)
-        self.microphone_label.pack(anchor=tk.CENTER, padx=10, pady=5)
-
-        self.start_button = tk.Button(self.frame, text="Start", command=self.start_stop_action)
-        self.start_button.pack(anchor=tk.CENTER, padx=10, pady=5)
-
-        self.label = tk.Label(self.frame, text="")
-        self.label.pack(anchor=tk.CENTER)
-
-        self.is_running = False
-        self.audio_thread = None
-
-    def start_stop_action(self):
-        if not self.is_running:
-            self.is_running = True
-            self.start_button.config(text="Stop")
-            self.label.config(text="Recording")
-            self.audio_thread = threading.Thread(target=self.record_audio)
-            self.audio_thread.start()
-        else:
-            self.is_running = False
-            self.start_button.config(text="Start")
-            self.label.config(text="")
-            if self.audio_thread and self.audio_thread.is_alive():
-                self.audio_thread.join()
-
-    def record_audio(self):
-        audio_data = []
-        while self.is_running:
-            # Recording audio for 0.5 seconds (adjust duration as needed)
-            data = sd.rec(int(44100 * 5), samplerate=44100, channels=2, dtype=np.int16)
-            audio_data.extend(data)
-            sd.wait()
-        # Save or process audio data here (e.g., save to a file, process the audio, etc.)
-        # Convert the NumPy array to audio file
-        wv.write("recording1.wav", audio_data, 44100, sampwidth=2)
-        
-        ques = api_s.transcrpt("recording1.wav")
-        command=api_s.chat(ques)
-        print(command)
-
- 
-        
-        
-        # Run the command using subprocess 
-        try: 
-            # Execute the command in the terminal 
-            if command=="ls": 
-                command="dir"
-            subprocess.run(command, shell=True, check=True) 
-        except subprocess.CalledProcessError as e: 
-            # Handle any errors that occur during command execution 
-            print(f"Command execution failed: {e}")
+client = OpenAI(api_key=keys.secret)
 
 
-        
 
-        
+def transcrpt(aud):
+    audio_file= open(aud, "rb")
+    transcript = client.audio.transcriptions.create(
+    model="whisper-1", 
+    file=audio_file, 
+    response_format="text"
+    )
 
-def main():
-    root = tk.Tk()
-    app = SimpleApp(root)
-    root.mainloop()
+    # print(f"transcript={transcript}")
+    return transcript
 
-if __name__ == "__main__":
-    main()
+def chat(q):
+    response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+    {"role": "system", "content": "You provide only shell commands to run in command line.Dont add any other text. Dont add any placeholder text. provide command as it should be typed in cmmand line."},
+    {"role": "user", "content": "provide code to complete the following task. give message as 'error' if task doesnt make sense:"+q}
+    ],
+    temperature=0.85, 
+    max_tokens=256, 
+    top_p=1, 
+    frequency_penalty=0, 
+    presence_penalty=0
+
+    )
+
+    # print(f"response = {response.choices[0].message.content}")
+    return response.choices[0].message.content
+
+    
