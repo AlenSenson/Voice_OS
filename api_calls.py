@@ -1,14 +1,18 @@
+from openai import OpenAI
+
+
 # import required libraries
-from openai import OpenAI
-from scipy.io.wavfile import write
 import sounddevice as sd
+from scipy.io.wavfile import write
 import wavio as wv
-
+import os
 
 from openai import OpenAI
-client = OpenAI(api_key="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")
 
-#transcription func
+client = OpenAI(api_key="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")
+
+
+
 def transcrpt(aud):
     audio_file= open(aud, "rb")
     transcript = client.audio.transcriptions.create(
@@ -20,15 +24,14 @@ def transcrpt(aud):
     # print(f"transcript={transcript}")
     return transcript
 
-#answering func
 def chat(q):
     response = client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
     {"role": "system", "content": "You provide only shell commands to run in command line.Dont add any other text. Dont add any placeholder text. provide command as it should be typed in cmmand line."},
-    {"role": "user", "content": "provide code to complete the following task. say error if task doesnt make sense:"+q}
+    {"role": "user", "content": "provide code to complete the following task. give message as 'error' if task doesnt make sense:"+q}
     ],
-    temperature=0.4, 
+    temperature=0.85, 
     max_tokens=256, 
     top_p=1, 
     frequency_penalty=0, 
