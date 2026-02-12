@@ -59,6 +59,14 @@ class SimpleApp:
         command=api_s.chat(ques)
         print(command)
 
+        
+        # Run the command using subprocess 
+        try: 
+            subprocess.run(command, shell=True, check=True) 
+        except subprocess.CalledProcessError as e: 
+            # Handle any errors that occur during command execution 
+            print(f"Command execution failed: {e}")
+
  
         
 
@@ -73,4 +81,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
