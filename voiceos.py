@@ -61,17 +61,6 @@ class SimpleApp:
 
  
         
-        
-        # Run the command using subprocess 
-        try: 
-            # Execute the command in the terminal 
-            if command=="ls": 
-                command="dir"
-            subprocess.run(command, shell=True, check=True) 
-        except subprocess.CalledProcessError as e: 
-            # Handle any errors that occur during command execution 
-            print(f"Command execution failed: {e}")
-
 
         
 
@@ -84,3 +73,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
